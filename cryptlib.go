@@ -18,6 +18,8 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var NonMatchingPasswords = errors.New("Passwords did not match")
+
 func Decrypt(enc io.Reader) (io.Reader, error) {
 	var source io.Reader
 	source = bufio.NewReader(enc)
@@ -270,7 +272,7 @@ func PassPrompt() ([]byte, error) {
 		return nil, err
 	}
 	if !bytes.Equal(pass, repass) {
-		return nil, errors.New("Passwords did not match")
+		return nil, NonMatchingPasswords
 	}
 	return pass, nil
 }
