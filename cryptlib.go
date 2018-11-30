@@ -48,8 +48,8 @@ func Decrypt(enc io.Reader) (io.Reader, error) {
 				fmt.Fprintf(os.Stderr, "\nincorrect. ")
 			}
 			failed = true
-			fmt.Fprintf(os.Stderr, "decrypt password: ")
-			return terminal.ReadPassword(int(syscall.Stdin))
+
+			return PassPrompt("Decryption password")
 		}, nil)
 	fmt.Fprint(os.Stderr, "\n")
 
@@ -259,13 +259,14 @@ func IsEncrypted(filename string) (bool, error) {
 	return false, nil
 }
 
-func PassPrompt() ([]byte, error) {
-	fmt.Fprint(os.Stderr, "Enter password to encrypt: ")
+func DoublePrompt(first string, second string) ([]byte, error) {
+	fmt.Fprintf(os.Stderr, "%s: ", first)
 	pass, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return nil, err
 	}
-	fmt.Fprint(os.Stderr, "\nRe-Enter password: ")
+
+	fmt.Fprintf(os.Stderr, "\n%s: ", second)
 	repass, err := terminal.ReadPassword(int(syscall.Stdin))
 	fmt.Fprint(os.Stderr, "\n")
 	if err != nil {
@@ -275,4 +276,9 @@ func PassPrompt() ([]byte, error) {
 		return nil, NonMatchingPasswords
 	}
 	return pass, nil
+}
+
+func PassPrompt(prompt string) ([]byte, error) {
+	fmt.Fprintf(os.Stderr, "%s: ", prompt)
+	return terminal.ReadPassword(int(syscall.Stdin))
 }
